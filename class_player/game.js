@@ -5,7 +5,7 @@ GAME_WIDTH = 320;
 GAME_HEIGHT = 320;
 
 var Player = enchant.Class.create(enchant.Sprite, {
-    initialize: function(x, y){
+    initialize: function(x){
 		this.KUMA_WIDTH = 20;
 		this.KUMA_HEIGHT = 30;
 		this.KUMA_Y = 50;
@@ -77,9 +77,11 @@ window.onload = function() {
       	bear.image = game.assets['bear.gif'];
 		bear.dir = 0;		//進行方向 0:右(right)、1:左(left)
         bear.walk = 0;		//歩行ポーズ 0:停止 1:右足 2:左足
-
+		//var kuma = new Player(0);
+		
 		bear.addEventListener('enterframe', function() {
 			bear.frame = bear.dir * 3 + bear.walk;
+			//kuma.change_frame;
 			
 			//go to right 右へ進む
 			if(game.input.right) {
