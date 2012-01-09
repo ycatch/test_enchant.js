@@ -1,9 +1,20 @@
 //2012-01-09 player bearをclass化する
 
 enchant();
+
 var Player = enchant.Class.create(enchant.Sprite, {
+
     initialize: function(x, y){
-	}
+		this.KUMA_WIDTH = 20;
+		this.KUMA_HEIGHT = 30;
+		this.KUMA_Y = 50;
+		
+	    enchant.Sprite.call(this, this.KUMA_WIDTH, this.KUMA_HEIGHT);
+        this.image = game.assets['bear.gif'];
+		this.x = x; this.y = this.KUMA_Y; this.frame = 0;		
+		
+        game.rootScene.addChild(this);
+    }
 });
 
 window.onload = function() {
