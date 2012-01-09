@@ -1,8 +1,8 @@
 //2012-01-09 player bearをclass化する
 
 enchant();
-GAME_WIDTH = 320;
-GAME_HEIGHT = 320;
+SCREEN_WIDTH = 320;
+SCREEN_HEIGHT = 320;
 
 var Player = enchant.Class.create(enchant.Sprite, {
     initialize: function(x){
@@ -28,10 +28,10 @@ var Player = enchant.Class.create(enchant.Sprite, {
 		} else if(this.walk == 1) {
 			this.walk = 2;
 		}
-		if (this.x < (GAME_HEIGHT - this.KUMA_WIDTH)) {
+		if (this.x < (SCREEN_WIDTH - this.KUMA_WIDTH)) {
 			this.x += this.step;
 		} else {
-			this.x = GAME_HEIGHT - this.KUMA_WIDTH;
+			this.x = SCREEN_WIDTH - this.KUMA_WIDTH;
 		}
     },
     move_left: function(){
@@ -60,7 +60,7 @@ var Player = enchant.Class.create(enchant.Sprite, {
 
 window.onload = function() {
 	//init 初期化
-    var game = new Game(GAME_WIDTH, GAME_HEIGHT);
+    var game = new Game(SCREEN_WIDTH, SCREEN_HEIGHT);
     game.preload('jump.wav', 'bear.gif');
 	game.fps = 15;
 	
@@ -77,14 +77,15 @@ window.onload = function() {
       	bear.image = game.assets['bear.gif'];
 		bear.dir = 0;		//進行方向 0:右(right)、1:左(left)
         bear.walk = 0;		//歩行ポーズ 0:停止 1:右足 2:左足
-		//var kuma = new Player(0);
+		//var bear = new Player(0);
 		
 		bear.addEventListener('enterframe', function() {
 			bear.frame = bear.dir * 3 + bear.walk;
-			//kuma.change_frame;
+			//bear.change_frame;
 			
 			//go to right 右へ進む
 			if(game.input.right) {
+				//bear.move_right;
 				bear.dir = 0;
 				if((bear.walk == 0) || (bear.walk == 2)){
 					bear.walk = 1;
@@ -101,6 +102,7 @@ window.onload = function() {
 			
 			//go to left 左へ進む
 			if(game.input.left) {
+				//bear.move_left;
 				bear.dir = 1;
 				if((bear.walk == 0) || (bear.walk == 2)){
 					bear.walk = 1;
@@ -117,6 +119,7 @@ window.onload = function() {
 			
 			//stop 停止
 			if(!(game.input.right || game.input.left)) {
+				//bear.move_stop;
 				if(bear.walk !== 0) {
 					game.assets['jump.wav'].play();
 				}
