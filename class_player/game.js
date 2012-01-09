@@ -73,61 +73,15 @@ window.onload = function() {
     game.onload = function() {
 	    game.assets['jump.wav'].play();
 
-		var bear = new Sprite(20, 30);
-      	bear.image = game.assets['bear.gif'];
-		bear.dir = 0;		//進行方向 0:右(right)、1:左(left)
-        bear.walk = 0;		//歩行ポーズ 0:停止 1:右足 2:左足
-		//var bear = new Player(0);
+		var bear = new Player(0);
 		
-		bear.addEventListener('enterframe', function() {
-			bear.frame = bear.dir * 3 + bear.walk;
-			//bear.change_frame;
-			
-			//go to right 右へ進む
-			if(game.input.right) {
-				//bear.move_right;
-				bear.dir = 0;
-				if((bear.walk == 0) || (bear.walk == 2)){
-					bear.walk = 1;
-				} else if(bear.walk == 1) {
-					bear.walk = 2;
-				}
-				
-				if (bear.x < 300) {
-					bear.x += 5;
-				} else {
-					bear.x = 300;
-				}
-			}
-			
-			//go to left 左へ進む
-			if(game.input.left) {
-				//bear.move_left;
-				bear.dir = 1;
-				if((bear.walk == 0) || (bear.walk == 2)){
-					bear.walk = 1;
-				} else if(bear.walk == 1) {
-					bear.walk = 2;
-				}
-
-				if (bear.x > 0) {
-					bear.x -= 5;
-				} else {
-					bear.x = 0;
-				}
-			}
-			
-			//stop 停止
-			if(!(game.input.right || game.input.left)) {
-				//bear.move_stop;
-				if(bear.walk !== 0) {
-					game.assets['jump.wav'].play();
-				}
-				bear.walk = 0;				
-			}
-			bear.y = 50;
+		game.rootScene.addEventListener('enterframe', function() {
+			bear.change_frame();
+			if(game.input.right) bear.move_right();
+			if(game.input.left) bear.move_left();
+			if(!(game.input.right || game.input.left)) bear.move_stop();
 		});
-		game.rootScene.addChild(bear);
+		//game.rootScene.addChild(bear);
 
 		//クマの位置をラベルに表示
 		var label_potision = new Label();
