@@ -1,6 +1,10 @@
 //2012-01-09 player bearをclass化する
 
 enchant();
+var Player = enchant.Class.create(enchant.Sprite, {
+    initialize: function(x, y){
+	}
+});
 
 window.onload = function() {
 	//init 初期化
