@@ -1,6 +1,8 @@
 //Bear catch apples.
 //Copyright 2012 Yutaka Kachi
-//MIT Licence
+//This software licensed under MIT Licence.
+
+//2012-01-24 マップ表示、両端をなくす
 
 enchant();
 SCREEN_WIDTH = 320;
@@ -11,7 +13,7 @@ var Kuma = enchant.Class.create(enchant.Sprite, {
     initialize: function(x, y){
 		this.KUMA_WIDTH = 20;
 		this.KUMA_HEIGHT = 30;
-		this.KUMA_Y = 200;
+		this.KUMA_Y = 226;
 		this.dir = 0;		//進行方向 0:右(right)、1:左(left)
 		this.walk = 0;		//歩行ポーズ 0:停止 1:右足 2:左足
 		this.step = 5;
@@ -41,10 +43,10 @@ var Kuma = enchant.Class.create(enchant.Sprite, {
 		} else if(this.walk == 1) {
 			this.walk = 2;
 		}
-		if (this.x < (SCREEN_WIDTH - this.KUMA_WIDTH)) {
+		if (this.x < SCREEN_WIDTH) {
 			this.x += this.step;
 		} else {
-			this.x = SCREEN_WIDTH - this.KUMA_WIDTH;
+			this.x = 0;
 		}
 	},
 	move_left: function() {
@@ -57,7 +59,7 @@ var Kuma = enchant.Class.create(enchant.Sprite, {
 		if (this.x > 0) {
 			this.x -= this.step;
 		} else {
-			this.x = 0;
+			this.x = SCREEN_WIDTH - this.KUMA_WIDTH;
 		}
 	},
 	move_stop: function(){
@@ -109,8 +111,34 @@ window.onload = function() {
 	game = new Game(SCREEN_WIDTH, SCREEN_HEIGHT); 
 	game.fps = 15;
 	game.score = 0;
-	game.preload('bear.gif', 'icon0.gif', 'jump.wav');
+	game.preload('bear.gif', 'icon0.gif',  'map2.gif', 'jump.wav');
 	game.onload = function() {
+		var blocks = [
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+			[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+		];　
+        var map = new Map(16, 16);
+        map.image = game.assets['map2.gif'];
+        map.loadData(blocks);
+		game.rootScene.addChild(map);
+		game.rootScene.backgroundColor = 'rgb(153, 153, 255)';
+
 		player = new Kuma(0, 0);
 		targets = [];
 		game.rootScene.addEventListener('enterframe', function(){
