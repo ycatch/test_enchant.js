@@ -2,6 +2,7 @@
 //Copyright 2012 Yutaka Kachi
 //This software licensed under MIT Licence.
 
+//2012-01-24 敵キャラを追加
 //2012-01-24 マップ表示、両端をなくす
 
 enchant();
@@ -94,7 +95,63 @@ var Apple = enchant.Class.create(enchant.Sprite, {
 		if(this.intersect(player)){
 			this.remove();
 			game.assets['jump.wav'].play();
-			game.score += 1;
+			game.score += 10;
+		}
+		//下端に到達
+		if (this.y >= (SCREEN_HEIGHT - this.HEIGHT)) {
+			this.remove();
+		}
+		scoreLabel.score = game.score;
+	},
+	remove: function(){
+		game.rootScene.removeChild(this);
+	}
+});
+
+//複数表示される敵キャラ
+var Enemy = enchant.Class.create(enchant.Sprite, {
+	initialize: function(x, y){
+		this.WIDTH = 16;
+		this.HEIGHT = 16;
+		this.STEP_Y = 5;
+
+		var dir_f = 1;
+		if ((rand(10) % 2)==0) dir_f = -1;
+		this.STEP_X = dir_f * (rand(5) + 1);
+
+		this.bounce_f = 0; //地面ではねたかどうかのフラグ 0:はねてない、1:はねた。
+		this.bounce_y = this.STEP_Y;
+		this.bounce_step_y = 0;
+
+		enchant.Sprite.call(this, this.WIDTH, this.HEIGHT);
+		this.image = game.assets['icon0.gif'];
+		this.x = x;
+		this.y = y;
+		this.frame = 11; //skull
+		this.addEventListener('enterframe', function(){
+			this.move_step();
+		});
+		game.rootScene.addChild(this);
+	},
+	move_step: function() {
+		this.x += this.STEP_X;
+		if((this.x < 0)||(this.x >= (SCREEN_WIDTH - this.WIDTH))) {
+			this.STEP_X *= -1;
+		}
+		this.y += this.bounce_y;
+		this.bounce_y += this.bounce_step_y;
+		
+		//当り判定
+		if(this.intersect(player)){
+			this.remove();
+			game.assets['clash.wav'].play();
+			game.score -= 10;
+		}
+		//地面に到達
+		if ((this.y >= 230) && (this.bounce_f == 0)){
+			this.bounce_y = (rand(10) + 10) * (-1);	//はねる量
+			this.bounce_step_y = 1;	//はねたあとの変化分
+			this.bounce_f = 1;
 		}
 		//下端に到達
 		if (this.y >= (SCREEN_HEIGHT - this.HEIGHT)) {
@@ -111,7 +168,7 @@ window.onload = function() {
 	game = new Game(SCREEN_WIDTH, SCREEN_HEIGHT); 
 	game.fps = 15;
 	game.score = 0;
-	game.preload('bear.gif', 'icon0.gif',  'map2.gif', 'jump.wav');
+	game.preload('bear.gif', 'icon0.gif',  'map2.gif', 'jump.wav', 'clash.wav');
 	game.onload = function() {
 		var blocks = [
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
@@ -145,6 +202,11 @@ window.onload = function() {
  			if((game.frame % 10) == 0){
 				targets[game.frame] = new Apple(rand(300), 0);
 			}
+
+ 			if((game.frame % 50) == 0){
+				targets[game.frame] = new Enemy(rand(300), 0);
+			}
+
 			if(timeLabel.time <= 0){
 				game.end(game.score, "you get apples:" + game.score);
 			}
@@ -154,7 +216,7 @@ window.onload = function() {
 		timeLabel.time = 30
 		game.rootScene.addChild(timeLabel);
 
-		scoreLabel = new ScoreLabel(190, 8);
+		scoreLabel = new ScoreLabel(170, 8);
 		scoreLabel.label = "APPLE:";
 		game.rootScene.addChild(scoreLabel);
 		
