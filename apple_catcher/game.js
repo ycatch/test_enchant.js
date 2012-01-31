@@ -2,9 +2,6 @@
 //Copyright 2012 Yutaka Kachi
 //This software licensed under MIT Licence.
 
-//2012-01-24 敵キャラを追加
-//2012-01-24 マップ表示、両端をなくす
-
 enchant();
 SCREEN_WIDTH = 320;
 SCREEN_HEIGHT = 320;
@@ -17,7 +14,7 @@ var Kuma = enchant.Class.create(enchant.Sprite, {
 		this.KUMA_Y = 226;
 		this.dir = 0;		//進行方向 0:右(right)、1:左(left)
 		this.walk = 0;		//歩行ポーズ 0:停止 1:右足 2:左足
-		this.step = 5;
+		this.step = 7;
 		
 		enchant.Sprite.call(this, this.KUMA_WIDTH, this.KUMA_HEIGHT);
 		this.image = game.assets['bear.gif'];
@@ -76,7 +73,7 @@ var Apple = enchant.Class.create(enchant.Sprite, {
 	initialize: function(x, y){
 		this.WIDTH = 16;
 		this.HEIGHT = 16;
-		this.STEP = 5;
+		this.STEP = 7;
 		
 		enchant.Sprite.call(this, this.WIDTH, this.HEIGHT);
 		this.image = game.assets['icon0.gif'];
@@ -94,14 +91,15 @@ var Apple = enchant.Class.create(enchant.Sprite, {
 		//当り判定
 		if(this.intersect(player)){
 			this.remove();
-			game.assets['jump.wav'].play();
+			var sound = game.assets['jump.wav'].clone();
+			sound.play();
 			game.score += 10;
+			scoreLabel.score = game.score;
 		}
 		//下端に到達
 		if (this.y >= (SCREEN_HEIGHT - this.HEIGHT)) {
 			this.remove();
 		}
-		scoreLabel.score = game.score;
 	},
 	remove: function(){
 		game.rootScene.removeChild(this);
@@ -113,7 +111,7 @@ var Enemy = enchant.Class.create(enchant.Sprite, {
 	initialize: function(x, y){
 		this.WIDTH = 16;
 		this.HEIGHT = 16;
-		this.STEP_Y = 5;
+		this.STEP_Y = 8;
 
 		var dir_f = 1;
 		if ((rand(10) % 2)==0) dir_f = -1;
@@ -144,11 +142,13 @@ var Enemy = enchant.Class.create(enchant.Sprite, {
 		//当り判定
 		if(this.intersect(player)){
 			this.remove();
-			game.assets['clash.wav'].play();
+			var sound = game.assets['jump2.wav'].clone();
+			sound.play();
 			game.score -= 10;
+			scoreLabel.score = game.score;
 		}
 		//地面に到達
-		if ((this.y >= 230) && (this.bounce_f == 0)){
+		if ((this.y >= 236) && (this.bounce_f == 0)){
 			this.bounce_y = (rand(10) + 10) * (-1);	//はねる量
 			this.bounce_step_y = 1;	//はねたあとの変化分
 			this.bounce_f = 1;
@@ -157,7 +157,6 @@ var Enemy = enchant.Class.create(enchant.Sprite, {
 		if (this.y >= (SCREEN_HEIGHT - this.HEIGHT)) {
 			this.remove();
 		}
-		scoreLabel.score = game.score;
 	},
 	remove: function(){
 		game.rootScene.removeChild(this);
@@ -166,9 +165,9 @@ var Enemy = enchant.Class.create(enchant.Sprite, {
 
 window.onload = function() {
 	game = new Game(SCREEN_WIDTH, SCREEN_HEIGHT); 
-	game.fps = 15;
+	game.fps = 12;
 	game.score = 0;
-	game.preload('bear.gif', 'icon0.gif',  'map2.gif', 'jump.wav', 'clash.wav');
+	game.preload('bear.gif', 'icon0.gif', 'map2.gif', 'jump.wav', 'jump2.wav');
 	game.onload = function() {
 		var blocks = [
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
@@ -198,22 +197,26 @@ window.onload = function() {
 
 		player = new Kuma(0, 0);
 		targets = [];
-		game.rootScene.addEventListener('enterframe', function(){
- 			if((game.frame % 10) == 0){
-				targets[game.frame] = new Apple(rand(300), 0);
-			}
+		var apple_rate = [10, 8, 7, 6, 6, 6, 6, 5, 10];		//リンゴの出現頻度
+		var enemy_rate = [50, 40, 30, 30, 20, 10, 10, 5, 50];	//敵の出現頻度
 
- 			if((game.frame % 50) == 0){
-				targets[game.frame] = new Enemy(rand(300), 0);
+		game.rootScene.addEventListener('enterframe', function(){
+			var rate_index = 8 - Math.floor(timeLabel.time * 0.02); //ターゲット出現頻度の添字を算出
+
+ 			if((game.frame % 10) == 0){
+				targets.push(new Apple(rand(300), 0));
 			}
+			if((game.frame % enemy_rate[rate_index]) == 0){
+				targets.push(new Enemy(rand(300), 0));
+			} 
 
 			if(timeLabel.time <= 0){
-				game.end(game.score, "you get apples:" + game.score);
+				game.end(game.score, "You get apples:" + game.score);
 			}
 		});
 
-		timeLabel = new TimeLabel(0, 8, 'countdown');
-		timeLabel.time = 30
+		timeLabel = new TimeLabel(0, 8, 'countdown');	//ダウンカウント
+		timeLabel.time = 30								//30秒から
 		game.rootScene.addChild(timeLabel);
 
 		scoreLabel = new ScoreLabel(170, 8);
